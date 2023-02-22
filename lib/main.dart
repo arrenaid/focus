@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:focus/pomodoro_screen.dart';
+import 'package:focus/screens/focus_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
 
         primarySwatch: Colors.blue,
       ),
-      home: PomodoroScreen(),
+      home: const FocusScreen(),
     );
   }
 }
