@@ -49,6 +49,6 @@ class FocusCompleteState extends FocusState {
   FocusCompleteState(int timerType) : super(timerType, '00:00', false);
 
   @override
-  String toString() => 'FocusPauseState {  }';
+  String toString() => 'FocusCompleteState {  }';
 }
 

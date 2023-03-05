@@ -6,6 +6,9 @@ abstract class FocusEvent extends Equatable{
   @override
   List<Object?> get props => [];
 }
+class FocusInitialEvent extends FocusEvent{
+  const FocusInitialEvent();
+}
 class FocusStartEvent extends FocusEvent{
   const FocusStartEvent();
 }
@@ -23,6 +26,9 @@ class FocusChangeTypeShortEvent extends FocusEvent{
 }
 class FocusChangeTypeLongEvent extends FocusEvent{
   const FocusChangeTypeLongEvent();
+}
+class FocusChangeTypePomodoroEvent extends FocusEvent{
+  const FocusChangeTypePomodoroEvent();
 }
 class FocusTickedEvent extends FocusEvent{
   final String str;

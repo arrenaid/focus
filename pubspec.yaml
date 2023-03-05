@@ -39,6 +39,10 @@ dependencies:
   bloc: ^7.2.0
   flutter_bloc: ^7.2.0
   equatable: ^2.0.5
+  sqflite: ^2.2.5
+  path_provider: ^2.0.13
+  path: ^1.8.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +82,13 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Maximus
+      fonts:
+        - asset: assets/Maximus.ttf
+    - family: DeusEx
+      fonts:
+        - asset: assets/Deus Ex.otf
   # fonts:
   #   - family: Schyler
   #     fonts:
