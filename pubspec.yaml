@@ -86,6 +86,9 @@ flutter:
     - family: Maximus
       fonts:
         - asset: assets/Maximus.ttf
+    - family: MaxS
+      fonts:
+        - asset: assets/MaxS.ttf
     - family: DeusEx
       fonts:
         - asset: assets/Deus Ex.otf

@@ -5,12 +5,13 @@ import 'package:equatable/equatable.dart';
 part 'focus_state.dart';
 part 'focus_event.dart';
 
-const int pomodoro = 25;
-const int short = 5;
-const int long = 15;
+const int pomodoro = 25000;
+const int short = 5000;
+const int long = 15000;
+const int tick = 25;
 
 class FocusBloc extends Bloc<FocusEvent,FocusState>{
-  FocusBloc() : super(FocusInitialState(pomodoro,_updateStr(pomodoro)));
+  FocusBloc() : super(FocusInitialState(pomodoro,_updateStrAlt(pomodoro),'00'));
 
   Timer ? _timer;
   int _waitTime = pomodoro;
@@ -26,7 +27,7 @@ class FocusBloc extends Bloc<FocusEvent,FocusState>{
       FocusEvent event,
       ) async* {
     if(event is FocusStartEvent){
-      yield* _mapStartToState(event);
+      yield* _mapStartAlternativeTick(event);
     }else if(event is FocusInitialEvent){
       yield* _mapInitialToState(event);
     } else if(event is FocusPauseEvent){
@@ -47,10 +48,18 @@ class FocusBloc extends Bloc<FocusEvent,FocusState>{
   }
 
 
-  static String _updateStr( int time ){
-    var minuteStr = (time ~/ 60).toString().padLeft(2,'0');
-    var secondStr = (time % 60).toString().padLeft(2,'0');
+  // static String _updateStr( int time ){
+  //   var minuteStr = (time ~/ 60).toString().padLeft(2,'0');
+  //   var secondStr = (time % 60).toString().padLeft(2,'0');
+  //   return '$minuteStr:$secondStr';
+  // }
+  static String _updateStrAlt( int time ){
+    var minuteStr = ((time/1000) ~/ 60).toString().padLeft(2,'0');
+    var secondStr = ((time/1000) % 60).toInt().toString().padLeft(2,'0');
     return '$minuteStr:$secondStr';
+  }
+  String getMilliSec(){
+    return ((_waitTime % 1000) ~/10).toInt().toString().padLeft(2,'0');
   }
 
   Stream<FocusState> _mapInitialToState(FocusInitialEvent event) async* {
@@ -62,7 +71,18 @@ class FocusBloc extends Bloc<FocusEvent,FocusState>{
     if(_waitTime > 0){
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         _waitTime -= 1;
-        add(FocusTickedEvent(_updateStr(_waitTime)));
+        add(FocusTickedEvent(_updateStrAlt(_waitTime)));
+        if(_waitTime <= 0){
+          add(const FocusStopEvent());
+        }
+      });
+    }
+  }
+  Stream<FocusState>  _mapStartAlternativeTick(FocusStartEvent start) async*{
+    if(_waitTime > 0){
+      _timer = Timer.periodic(const Duration(milliseconds: tick), (timer) {
+        _waitTime -= tick;
+        add(FocusTickedEvent(_updateStrAlt(_waitTime)));
         if(_waitTime <= 0){
           add(const FocusStopEvent());
         }
@@ -73,31 +93,31 @@ class FocusBloc extends Bloc<FocusEvent,FocusState>{
   Stream<FocusState> _mapPauseToState(FocusPauseEvent event) async* {
     if(state is FocusRunState){
       _timer?.cancel();
-      yield FocusPauseState(state.timerType, _updateStr(_waitTime));
+      yield FocusPauseState(state.timerType, _updateStrAlt(_waitTime), getMilliSec());
     }
   }
 
   Stream<FocusState> _mapResetToState(FocusResetEvent event) async* {
     _timer?.cancel();
-      yield FocusResetState(state.timerType,_updateStr(_waitTime),state.isStart);
+      yield FocusResetState(state.timerType,_updateStrAlt(_waitTime), getMilliSec(),state.isStart);
       add(const FocusInitialEvent());
       add(const FocusStartEvent());
   }
   Stream<FocusState> _mapChangeTypeLongToState(FocusChangeTypeLongEvent event) async* {
     _timer?.cancel();
-    yield FocusInitialState(long,_updateStr(long));
+    yield FocusInitialState(long,_updateStrAlt(long),'00');
     add(const FocusInitialEvent());
     add(const FocusStartEvent());
   }
   Stream<FocusState> _mapChangeTypeShortToState(FocusChangeTypeShortEvent event) async* {
     _timer?.cancel();
-    yield  FocusInitialState(short,_updateStr(short));
+    yield  FocusInitialState(short,_updateStrAlt(short),'00');
     add(const FocusInitialEvent());
     add(const FocusStartEvent());
   }
   Stream<FocusState> _mapChangeTypePomodoroToState(FocusChangeTypePomodoroEvent event) async* {
     _timer?.cancel();
-    yield  FocusInitialState(pomodoro,_updateStr(pomodoro));
+    yield  FocusInitialState(pomodoro,_updateStrAlt(pomodoro),'00');
     add(const FocusInitialEvent());
     add(const FocusStartEvent());
   }
@@ -105,11 +125,11 @@ class FocusBloc extends Bloc<FocusEvent,FocusState>{
     if(state is FocusRunState){
       _timer?.cancel();
        yield FocusCompleteState(state.timerType);
-      yield FocusInitialState(pomodoro,_updateStr(pomodoro));
+      yield FocusInitialState(pomodoro,_updateStrAlt(pomodoro),'00');
       add(const FocusInitialEvent());
     }
   }
   Stream<FocusState> _mapTickedToState(FocusTickedEvent event) async* {
-    yield FocusRunState(state.timerType, _updateStr(_waitTime));
+    yield FocusRunState(state.timerType, _updateStrAlt(_waitTime),getMilliSec());
   }
 }

@@ -32,39 +32,44 @@ class FocusPage extends StatelessWidget {
       child: BlocBuilder<FocusBloc,FocusState> (
         builder: (context,state){
         return Scaffold(
+          backgroundColor: col1,
       body: SafeArea(
         child: Stack(
           children: [
+            //milliseconds
+            Align(
+                alignment: const FractionalOffset(0.5, 0.3),
+              child: Text(context.read<FocusBloc>().getMilliSec(), style: tsAlt,),
+            ),
             if(state is FocusInitialState)...[
               Align(
-                alignment: const FractionalOffset(0.2, 0.2),
+                alignment: const FractionalOffset(0.5, 0.1),
                 child:  Container(
-                  decoration: const BoxDecoration(color: Colors.deepOrange),
                   padding: const EdgeInsets.all(5),
                   child: Text('${state.timerType.toString()}\nInitial',
-                    style: tsDef,
+                    style: tsUp,
                   ),
                 ),
               ),
             ],
+
             if(state is FocusRunState)...[
               Align(
-                alignment: const FractionalOffset(0.2, 0.2),
-                child:  Container( decoration:
-                const BoxDecoration(color: Colors.deepOrange),
+                alignment: const FractionalOffset(0.5, 0.1),
+                child:  Container(
                   padding: EdgeInsets.all(5),
                   child: Text('${state.timerType.toString()}\nRun',
-                    style: tsDef,),
+                    style: tsUp,),
                 ),
               ),
             ],
             if(state is FocusPauseState)...[
               Align(
-                alignment: const FractionalOffset(0.2, 0.2),
-                child:  Container( decoration: const BoxDecoration(color: Colors.deepOrange),
+                alignment: const FractionalOffset(0.5, 0.1),
+                child:  Container(
                   padding: EdgeInsets.all(5),
                   child: Text('${state.timerType.toString()}\nPause',
-                    style: tsDef,
+                    style: tsUp,
                   ),
                 ),
               ),
@@ -72,12 +77,13 @@ class FocusPage extends StatelessWidget {
             //clock
             Align(
               alignment: const FractionalOffset(0.5, 0.5),
-              child:  Container( decoration: const BoxDecoration(color: Colors.deepOrange),
-                padding: const EdgeInsets.all(5),
-                child: Container(
-                  width:  MediaQuery.of(context).size.width * 8 / 10 ,
-                    child: Text(state.str, style: tsDef.copyWith(fontSize: 100),)),
-              ),
+              // child:  Container( //decoration: const BoxDecoration(color: Colors.deepOrange),
+              //   padding: const EdgeInsets.all(5),
+              //   child: Container(
+              //     width:  MediaQuery.of(context).size.width * 8 / 10 ,
+                    child: Text(state.visibleResult, style: tsDef.copyWith(fontSize: 140),),
+              //   ),
+              // ),
             ),
             //button restart
             if(state is FocusPauseState)...[
@@ -104,9 +110,9 @@ class FocusPage extends StatelessWidget {
                 ? () => context.read<FocusBloc>().add(const FocusPauseEvent())
                 : () => context.read<FocusBloc>().add(const FocusStartEvent()),
             icon: Icon( state.isStart
-                ? Icons.pause_circle_outline_rounded
-                : Icons.play_circle_outline_rounded,
-              color: Colors.deepOrange,
+                ? Icons.pause_sharp
+                : Icons.play_arrow_sharp,
+              color: col5,
 
             ),
           )),
@@ -145,7 +151,7 @@ class FocusPage extends StatelessWidget {
             ),
             //bottom arrow
           Align(
-          alignment: const FractionalOffset(0.5, 0.95),
+          alignment: const FractionalOffset(0.5, 1),
           child: IconButton(
               iconSize: 50,
 
