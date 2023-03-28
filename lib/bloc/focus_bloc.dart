@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-
 part 'focus_state.dart';
 part 'focus_event.dart';
 
@@ -10,8 +10,29 @@ const int short = 5000;
 const int long = 15000;
 const int tick = 25;
 
+
 class FocusBloc extends Bloc<FocusEvent,FocusState>{
   FocusBloc() : super(FocusInitialState(pomodoro,_updateStrAlt(pomodoro),'00'));
+
+  // The callback for our alarm
+  @pragma('vm:entry-point')
+  static Future<void> callback() async {
+    // developer.log('Alarm fired!');
+    // // Get the previous cached count and increment it.
+    // final prefs = await SharedPreferences.getInstance();
+    // final currentCount = prefs.getInt(countKey) ?? 0;
+    // await prefs.setInt(countKey, currentCount + 1);
+
+    // // This will be null if we're running in the background.
+    // uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
+    // uiSendPort?.send(null);
+  }
+  @pragma('vm:entry-point')
+  static void printHello() {
+    final DateTime now = DateTime.now();
+    final int isolateId = Isolate.current.hashCode;
+    print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
+  }
 
   Timer ? _timer;
   int _waitTime = pomodoro;
@@ -47,6 +68,9 @@ class FocusBloc extends Bloc<FocusEvent,FocusState>{
     }
   }
 
+  showAlarm() async*{
+
+  }
 
   // static String _updateStr( int time ){
   //   var minuteStr = (time ~/ 60).toString().padLeft(2,'0');

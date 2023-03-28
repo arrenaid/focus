@@ -1,3 +1,4 @@
+//import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus/screens/statistic_screen.dart';
@@ -10,6 +11,7 @@ class FocusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //AndroidAlarmManager.initialize();
     return BlocProvider(//todo remove provider
       create: (_) => FocusBloc(),
       child: const FocusPage(),
@@ -24,6 +26,7 @@ class FocusPage extends StatelessWidget {
     return BlocListener<FocusBloc,FocusState>(listener: (context,state){
       if(state is FocusCompleteState){
         context.read<ModelBloc>().insert(state.timerType);// todo test
+        context.read<FocusBloc>().showAlarm();
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Finish', style: tsDef,),
               backgroundColor: Colors.red,));
@@ -112,8 +115,8 @@ class FocusPage extends StatelessWidget {
             icon: Icon( state.isStart
                 ? Icons.pause_sharp
                 : Icons.play_arrow_sharp,
-              color: col5,
-
+              color: col4,
+              shadows: const [shadowDef],
             ),
           )),
             //Buttons cell

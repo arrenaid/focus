@@ -1,10 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:focus/bloc/focus_bloc.dart';
 import 'package:focus/bloc/model_bloc.dart';
 import 'package:focus/screens/focus_screen.dart';
+import 'package:path/path.dart';
 
-void main() {
+// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+//
+// void onDidReceiveNotificationResponse(NotificationResponse notificationResponse) async {
+//   final String? payload = notificationResponse.payload;
+//   if (notificationResponse.payload != null) {
+//     debugPrint('notification payload: $payload');
+//   }
+//   await Navigator.push(
+//     context,
+//     MaterialPageRoute<void>(builder: (context) => FocusScreen(payload)),
+//   );
+// }
+
+main() async{
+  // WidgetsFlutterBinding.ensureInitialized();
+  //
+  // const AndroidInitializationSettings initializationSettingsAndroid =
+  // AndroidInitializationSettings('ic_launcher');
+  // final DarwinInitializationSettings initializationSettingsDarwin =
+  // DarwinInitializationSettings(
+  //     onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+  // final LinuxInitializationSettings initializationSettingsLinux =
+  // LinuxInitializationSettings(
+  //     defaultActionName: 'Open notification');
+  // final InitializationSettings initializationSettings = InitializationSettings(
+  //     android: initializationSettingsAndroid,
+  //     iOS: initializationSettingsDarwin,
+  //     macOS: initializationSettingsDarwin,
+  //     linux: initializationSettingsLinux);
+  // await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+  //     onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
+
+
   runApp(const MyApp());
 }
 
