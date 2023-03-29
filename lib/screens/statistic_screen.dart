@@ -1,7 +1,5 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus/constants.dart';
 import '../bloc/model_bloc.dart';
@@ -13,11 +11,14 @@ class StatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ModelBloc, ModelState>(builder: (context, state) {
+      List<DayRow> data = state.models.reversed.toList();
+      double topBoxSize = MediaQuery.of(context).size.width /5;
       return Scaffold(
         backgroundColor: col1,
         body: SafeArea(
           child: ListView(
-            //todo list all row
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            physics: const BouncingScrollPhysics(),
             children: [
               const Text(
                 'statistics',
@@ -25,27 +26,48 @@ class StatScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Wrap(
-                alignment: WrapAlignment.spaceBetween,
+                alignment: WrapAlignment.spaceEvenly,
                 children: [
-                  boxBuild(1, 50.0, false,
-                  Text('1')),
-                  boxBuild(1, 50.0, false,
-                      Text('2')),
-                  boxBuild(1, 50.0, false,
-                      Text('3')),
-                  boxBuild(1, 50.0, false,
-                      Text('4')),
+                  boxBuild( topBoxSize,  pi / 45, isFill: true,
+                      RichText(
+                        text: TextSpan(
+                          text: data.length.toString(),
+                          style: tsStat.copyWith(fontSize: 45),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: '\nall day',
+                                style: tsStat.copyWith(fontSize: 15)),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      // Column(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: [
+                      //     Text('${data.length}',
+                      //       style: tsStat.copyWith(fontSize: 45),
+                      //     textAlign: TextAlign.center,),
+                      //     Text('all day',
+                      //       style: tsStat.copyWith(fontSize: 15),
+                      //       textAlign: TextAlign.center,),
+                      //
+                      //   ],
+                      // )
+                  ),
+                  boxBuild( topBoxSize,  -pi / 45 , Text('2'), isFill: true),
+                  boxBuild( topBoxSize, -pi / 65, Text('3'), isFill: true),
+                  boxBuild( topBoxSize, pi / 85, Text('4') , isFill: true),
                 ],
               ),
+              const SizedBox(height: 10),
               if (state.models.isNotEmpty) ...[
                 ListView.separated(
                   shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
                   physics: const BouncingScrollPhysics(),
                   itemCount: state.models.length,
-                  padding: const EdgeInsets.all(8.0),
                   itemBuilder: (context, index) {
-                    var data = state.models;
                     return buildRow(data[index], index);
                   },
                   separatorBuilder: (BuildContext context, int index) =>
@@ -73,7 +95,7 @@ class StatScreen extends StatelessWidget {
     return Container(
       height: size,
       decoration: BoxDecoration(
-       // borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20),
         gradient: gradient,
       ),
       child: Wrap(
@@ -110,41 +132,86 @@ class StatScreen extends StatelessWidget {
             ),
           ),
           //const SizedBox(width: 20),
-          boxBuild(index, size, false,
-          Text('POM\n${data.pomodoroCount}',
-                    style: tsStat,
-            textAlign: TextAlign.center,
-          ),
+          boxBuild(
+            size,
+            index % 2 == 0 ? -pi / (45) : pi / (45),
+            // Text(
+            //   'POM\n${data.pomodoroCount}',
+            //   style: tsStat,
+            //   textAlign: TextAlign.center,
+            // ),
+            RichText(
+              text: TextSpan(
+                text: data.pomodoroCount.toString(),
+                style: tsStat.copyWith(fontSize: 45),
+                children: <TextSpan>[
+                  TextSpan(
+                      text: '\nPOMODORO',
+                      style: tsStat.copyWith(fontSize: 15)),
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+
           ),
           // SizedBox(width: 20),
-          boxBuild(index, size,true,
-            Text('SHO\n${data.shortCount}',
-                style: tsStat,
-            textAlign: TextAlign.center,),
+          boxBuild(
+            size,
+            index % 2 != 0 ? -pi / (45) : pi / (45),
+            // Text(
+            //   'SHO\n${data.shortCount}',
+            //   style: tsStat,
+            //   textAlign: TextAlign.center,
+            // ),
+            RichText(
+              text: TextSpan(
+                text: 'SHORT\n',
+                style: tsStat.copyWith(fontSize: 15),
+                children: <TextSpan>[
+                  TextSpan(text: data.shortCount.toString(), style: tsStat),
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+
           ),
           //const SizedBox(width: 10),
-          boxBuild(index, size, false,
-            Text('LON\n${data.longCount}',
-                style: tsStat,
-            textAlign: TextAlign.center,),
+          boxBuild(
+            size,
+            index % 2 == 0 ? -pi / (45) : pi / (45),
+            RichText(
+              text: TextSpan(
+                text:'LONG\n',
+                style: tsStat.copyWith(fontSize: 15),
+                children: <TextSpan>[
+                  TextSpan(text: data.longCount.toString(), style: tsStat),
+                ],
+              ),
+              textAlign: TextAlign.center,
+            ),
+
           ),
         ],
       ),
     );
   }
-  Widget boxBuild(index, size,bool isInverse, Widget up, ){
+
+  Widget boxBuild(size, double angle, Widget widget, {bool isFill = false}) {
     return Transform.rotate(
-      angle: index % 2 == 0 && isInverse ? -pi / (45) : pi / (45),
+      angle: angle, //index % 2 == 0 && isInverse ? -pi / (45) : pi / (45),
       child: Container(
         width: size,
         height: size,
-        // decoration: BoxDecoration(
-        //   color: col2.withOpacity(0.6),
-        //   border: Border.all(width: 2, color: col3),
-        //   //borderRadius: BorderRadius.circular(10),
-        // ),
+        decoration: isFill
+            ? BoxDecoration(
+                //color: col2.withOpacity(0.6),
+                gradient: gradient,
+                border: Border.all(width: 2, color: col2),
+                borderRadius: BorderRadius.circular(25),
+              )
+            : null,
         child: Center(
-          child: up,
+          child: widget,
         ),
       ),
     );

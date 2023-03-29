@@ -1,4 +1,5 @@
 //import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus/screens/statistic_screen.dart';
@@ -163,7 +164,8 @@ class FocusPage extends StatelessWidget {
                   return const StatScreen();
                 },);
                 },
-                icon: Icon(Icons.keyboard_arrow_up_rounded)
+                icon: const Icon(CupertinoIcons.arrowtriangle_up, color: col4,
+                  shadows: [shadowDef],)
             ),
           ),
           ],

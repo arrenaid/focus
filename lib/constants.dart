@@ -15,9 +15,7 @@ const LinearGradient gradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight, //Alignment(0.8, 1),
   colors: <Color>[
-    col1,
-    //col2,
-    col5,
+    col3,
     col4,
   ],
   tileMode: TileMode.mirror,
@@ -52,6 +50,12 @@ const TextStyle tsStat= TextStyle(
   fontSize: 30,
   color: col2,
   fontFamily: 'Maximus',
+  shadows: [shadowDef],
+);
+const TextStyle tsStatAlt = TextStyle(
+  fontSize: 15,
+  color: col5,
+  fontFamily: 'MaxS',
   shadows: [shadowDef],
 );
 const Shadow shadowDef = Shadow(
