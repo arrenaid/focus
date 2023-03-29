@@ -10,6 +10,8 @@ const Color col2 = Color(0xFF393E46);
 const Color col3 = Color(0xFFB71C1C);//B71C1C//FFD369
 const Color col4 = Color(0xFFa15501);
 const Color col5 = Color(0xFFd0902f);
+
+
 const TextStyle tsDef = TextStyle(
     fontSize: 50,
     color: col4,

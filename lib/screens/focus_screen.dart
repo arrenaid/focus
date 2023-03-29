@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:focus/screens/sequence_screen.dart';
 import 'package:focus/screens/statistic_screen.dart';
 import '../bloc/focus_bloc.dart';
 import '../bloc/model_bloc.dart';
@@ -40,6 +42,20 @@ class FocusPage extends StatelessWidget {
             Align(
                 alignment: const FractionalOffset(0.5, 0.3),
               child: Text(context.read<FocusBloc>().getMilliSec(), style: tsAlt,),
+            ),
+            Align(
+                alignment: const FractionalOffset(0.9, 0.1),
+                child:  IconButton(
+                  iconSize: 40,
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const SequenceScreen())
+                    );
+                  },
+                  icon: const Icon(CupertinoIcons.arrowtriangle_left, color: col4,
+                    //shadows: [shadowDef], //todo ref
+                  ),
+                )
             ),
             if(state is FocusInitialState)...[
               Align(
