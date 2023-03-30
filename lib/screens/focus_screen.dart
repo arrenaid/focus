@@ -73,7 +73,7 @@ class FocusPage extends StatelessWidget {
               Align(
                 alignment: const FractionalOffset(0.5, 0.1),
                 child:  Container(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   child: Text('${state.timerType.toString()}\nRun',
                     style: tsUp,),
                 ),
