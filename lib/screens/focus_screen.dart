@@ -28,7 +28,7 @@ class FocusPage extends StatelessWidget {
         context.read<ModelBloc>().insert(state.timerType);// todo test
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Finish', style: tsDef,),
-              backgroundColor: Colors.red,));
+              backgroundColor: col5,));
       }
     },
       child: BlocBuilder<FocusBloc,FocusState> (
@@ -176,7 +176,7 @@ class FocusPage extends StatelessWidget {
                   return const StatScreen();
                 },);
                 },
-                icon: Icon(Icons.keyboard_arrow_up_rounded)
+                icon: const Icon(Icons.keyboard_arrow_up_rounded)
             ),
           ),
           ],

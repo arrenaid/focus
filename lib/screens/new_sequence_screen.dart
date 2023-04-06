@@ -1,9 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:focus/model/step_sequence.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:focus/bloc/sequence_bloc.dart';
+import 'package:focus/model/component.dart';
 import 'dart:math';
 import '../constants.dart';
+import '../model/sequence.dart';
 
+///проблемы:кнопка разделитьель,
+/// - после добавления нового элемента появлятеся клавиатура
+/// -
 class NewSequenceScreen extends StatefulWidget {
   const NewSequenceScreen({Key? key}) : super(key: key);
 
@@ -12,26 +18,40 @@ class NewSequenceScreen extends StatefulWidget {
 }
 
 class _NewSequenceScreenState extends State<NewSequenceScreen> {
-  List<StepSeq> items = [StepSeq.empty()];
+  List<Component> items = [Component.controller(TextEditingController(),
+      TextEditingController())
+  ];
+  final TextEditingController _controllerText = TextEditingController();
+  bool isChange = false;
+  late Sequence sequence;
+
   // late String currentName;
   // late int currentMin;
 
-  List<TextEditingController> _controllersText = [];
-  List<TextEditingController> _controllersMin = [];
+  // List<TextEditingController> _controllersText = [];
+  // List<TextEditingController> _controllersMin = [];
 
   @override
   void initState() {
     super.initState();
-    // _controllerText.addListener(listenerName);
+     _controllerText.addListener((){});
     // _controllerMin.addListener(listenerMin);
   }
+
   @override
   void dispose() {
-    _controllersText.forEach((element) { element.dispose();});
-    _controllersMin.forEach((element) {element.dispose();});
-
+    items.forEach((element) {
+      if(element.controllerName != null) element.controllerName!.dispose();
+      element.controllerName = null;
+    });
+    items.forEach((element) {
+      if(element.controllerMin != null) element.controllerMin!.dispose();
+      element.controllerMin = null;
+    });
+    _controllerText.dispose();
     super.dispose();
   }
+
   // void listenerName(){
   //   currentName = _controllerText.text;
   // }
@@ -43,6 +63,21 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
   @override
   Widget build(BuildContext context) {
     //Map<String, int> sequence ;//= ['start', 10] as Map<String, int>;
+
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    if (arguments.isNotEmpty) {
+      isChange = true;
+      sequence = arguments['sequence'] as Sequence;
+      items.clear();
+      items.addAll(sequence.components);
+      for (var element in items) {
+        element.controllerName = TextEditingController(text: element.name);
+        element.controllerMin = TextEditingController(text: element.minute.toString());
+      }
+      _controllerText.text = sequence.name;
+    }
+
 
     return Scaffold(
       backgroundColor: col1,
@@ -67,8 +102,8 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                       color: col4,
                     ),
                   ),
-                  const Text(
-                    'new',
+                  Text(
+                    isChange? 'change': 'new',
                     style: tsDef,
                   ),
                   IconButton(
@@ -95,12 +130,13 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                         offset: Offset(4.0, 4.0), blurRadius: 8.0, color: col3),
                   ],
                 ),
-                child:  const Center(
+                child: Center(
                   child: TextField(
+                    controller: _controllerText,
                     style: tsButton,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.text,
-                    decoration: InputDecoration.collapsed(
+                    decoration: const InputDecoration.collapsed(
                       border: InputBorder.none,
                       hintText: 'sequence name',
                       hintStyle: tsButton,
@@ -112,33 +148,35 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                 height: 40,
               ),
               //configurator
-            if(items.isNotEmpty)...[
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return buildSequenceCard(index, context, items[index]);
-                },
-                separatorBuilder: (context, index) => SizedBox(
-                  height: 40,
-                  child: IconButton(
-                    iconSize: 35,
-                    icon: const Icon(
-                      CupertinoIcons.arrow_down,
-                      color: col4,
-                    ),
-                    onPressed: () {},
-                  ),
+              if(items.isNotEmpty)...[
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return buildSequenceCard(index, context, items[index]);
+                  },
+                  separatorBuilder: (context, index) =>
+                      SizedBox(
+                        height: 40,
+                        child: IconButton(
+                          iconSize: 35,
+                          icon: const Icon(
+                            CupertinoIcons.arrow_down,
+                            color: col4,
+                          ),
+                          onPressed: () => dropdownSequence,
+                        ),
+                      ),
+                  itemCount: items.length,
                 ),
-                itemCount: items.length,
-              ),
               ],
               //save
-              const SizedBox(height: 40),
+              if(items.length > 1)...[
+                const SizedBox(height: 40),
               SizedBox(
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context, 'OK'),
+                  onPressed:() => isChange ? saveChange(context): saveSequence(context),
                   style: ElevatedButton.styleFrom(
                     // padding: const EdgeInsets.symmetric(
                     //     horizontal: 35, vertical: 16),
@@ -147,12 +185,12 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                     shape: const StadiumBorder(),
                     backgroundColor: col5,
                   ),
-                  child: const Text(
-                    'save',
-                    style: tsDef,
+                  child: Text(
+                    isChange?'CHANGE':'SAVE',
+                    style: tsButton,
                   ),
                 ),
-              ),
+              ),],
               const SizedBox(height: 40),
             ],
           ),
@@ -161,18 +199,19 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
     );
   }
 
-  Widget buildSequenceCard(int index, BuildContext context, StepSeq item) {
-    if(index >= _controllersText.length) {//todo ref
-      _controllersText.add(TextEditingController());
-      _controllersMin.add(TextEditingController());
-    }
+  Widget buildSequenceCard(int index, BuildContext context, Component item) {
+    // if(index >= _controllersText.length) {//todo ref
+    //   _controllersText.add(TextEditingController());
+    //   _controllersMin.add(TextEditingController());
+    // }
 
-    if(item.name != null && (items.length - 1) == index) {
-      _controllersText[index].text = item.name!;
-    }
-    if(item.minute != null && (items.length - 1) == index) {
-      _controllersMin[index].text = item.minute.toString();
-    }
+    // if(item.name != null && (items.length - 1) == index) {
+    //   _controllersText[index].text = item.name!;
+    // }
+    // if(item.minute != null && (items.length - 1) == index) {
+    //   _controllersMin[index].text = item.minute.toString();
+    // }
+
     // else if(items[index].name != null){
     //   _controllersText[index].text = items[index].name!;
     // }
@@ -208,14 +247,14 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                 ),
                 child: Center(
                   child: TextField(
-                    controller: _controllersText[index],
+                    controller: item.controllerName,
                     style: tsButton,
                     textAlign: TextAlign.center,
                     keyboardType: TextInputType.text,
 
                     decoration: const InputDecoration.collapsed(
                       border: InputBorder.none,
-                      hintText: 'step name',
+                      hintText: 'Name component',
                       hintStyle: tsButton,
                     ),
                   ),
@@ -240,13 +279,13 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                       ),
                       child: Center(
                         child: TextField(
-                          controller: _controllersMin[index],
+                          controller: item.controllerMin,
                           style: tsButton,
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration.collapsed(
                             border: InputBorder.none,
-                            hintText: 'minutes',
+                            hintText: 'Minutes',
                             hintStyle: tsButton,
                           ),
                         ),
@@ -256,29 +295,29 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                       child: (items.length - 1) == index
-                          ? dropdownSequence()
+                          ?  dropdownSequence()
                           : ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  items.removeAt(index);
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 35, vertical: 16),
-                                shadowColor: col4,
-                                minimumSize: const Size.fromHeight(50),
-                                alignment: Alignment.center,
-                                shape: const StadiumBorder(),
-                                backgroundColor: col5,
-                              ),
-                              child: const Icon(CupertinoIcons.delete_simple,
-                                  color: col4))),
+                          onPressed: () {
+                            setState(() {
+                              items.removeAt(index);
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 35, vertical: 16),
+                            shadowColor: col4,
+                            minimumSize: const Size.fromHeight(50),
+                            alignment: Alignment.center,
+                            shape: const StadiumBorder(),
+                            backgroundColor: col5,
+                          ),
+                          child: const Icon(CupertinoIcons.delete_simple,
+                              color: col4))),
                 ],
               ),
             ),
             Text(
-              'step - $index',
+              'Component №$index',
               style: tsDef.copyWith(fontSize: 25, color: col2),
               textAlign: TextAlign.center,
             ),
@@ -291,9 +330,19 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
   Widget dropdownSequence() {
     List<String> list = [];
     if (!list.contains('add')) list.add('add');
-    Set<StepSeq> set = items.toSet();
-    list.addAll(List.generate(set.length, (index) => items[index].name ?? 'current' ));//todo
-    //var indexOf = list.indexOf('add');
+    Set<Component> set = items.toSet();
+    Component? elementEmpty;
+
+    for (int i = 0; i < set.length; i++) {
+      if (set.elementAt(i).name == null) elementEmpty = set.elementAt(i);
+    }
+    try {
+      if (elementEmpty != null) {
+        set.remove(elementEmpty);
+      }
+    }catch(e){print(e);}
+    list.addAll(List.generate(set.length, (index) => set.elementAt(index).name ?? 'emptyX0')); //todo в списке новый элемент всегда пустой, и он последний. получается что последний элемент нельзя клонировать
+    // var indexOf = list.indexOf('add');
     String dropdownValue = list.first;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -319,21 +368,24 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
           dropdownColor: col2,
           onChanged: (value) {
             // This is called when the user selects an item.
-            int parse = int.parse(_controllersMin.last.text);
+
+            if(items.last.controllerMin!.text.isNotEmpty
+              && items.last.controllerName!.text.isNotEmpty ){
 
             setState(() {
               //dropdownValue = value!;
-
               //save old
-              items.last.name = _controllersText.last.text;
+              items.last.name = items.last.controllerName!.text;
+              int parse = int.parse(items.last.controllerMin!.text);
               items.last.minute = parse;
 
-              if(value != list.first){
-                int? indexSet = list.indexOf(value!) ?? null;//todo ref
-                int indexOf = items.indexOf(set.elementAt(indexSet!)) ?? items.length;
+              if (value != list.first) {
+                int indexSet = list.indexOf(value!);
+                int indexOf = items.indexOf(set.elementAt(--indexSet));
                 items.add(items[indexOf]);
-              } else{
-                items.add(StepSeq.empty());
+              } else {
+                items.add(Component.controller(
+                  TextEditingController(), TextEditingController(),));
                 // print(_controllersText.last.text);
                 // print(parse);
                 //
@@ -341,9 +393,13 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
                 //   minute: parse,
                 //   position: 0, sequence: 0,));
               }
-
-
-            });
+            }
+            );
+            } else{
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Fill in the fields', style: tsButton,),
+                    backgroundColor: col2,));
+            }
           },
           items: list.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
@@ -358,5 +414,32 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
         ),
       ),
     );
+  }
+
+  void saveChange(BuildContext context) {
+
+  }
+
+  void saveSequence(BuildContext context) {
+    if(_controllerText.text.isNotEmpty) {
+      if(items.last.controllerName!.text.isNotEmpty
+          && items.last.controllerMin!.text.isNotEmpty ){
+      items.last.name = items.last.controllerName!.text;
+      items.last.minute = int.parse(items.last.controllerMin!.text);
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(content: Text('Fill in the fields component${items.length-1}', style: tsButton,),
+              backgroundColor: col2,));
+        return;
+      }
+      Sequence item = Sequence(name: _controllerText.text, components: items);
+      context.read<SequenceBloc>().add(SaveSequence(item));
+      Navigator.pop(context, 'OK');
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Enter sequence name', style: tsButton,),
+            backgroundColor: col2,));
+    }
   }
 }
