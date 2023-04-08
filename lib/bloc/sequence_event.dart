@@ -20,3 +20,11 @@ class RemoveSequence extends SequenceEvent{
   @override
   List<Object?> get props => [item];
 }
+class UpdateSequence extends SequenceEvent{
+  Sequence before;
+  Sequence after;
+  UpdateSequence(this.before, this.after);
+
+  @override
+  List<Object?> get props => [before,after];
+}

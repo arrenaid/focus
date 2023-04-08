@@ -9,6 +9,7 @@ class SequenceBloc extends Bloc<SequenceEvent,SequenceState>{
   SequenceBloc(super.initialState){
     on<SaveSequence> (_save);
     on<RemoveSequence> (_remove);
+    on<UpdateSequence> (_update);
   }
   _save(SaveSequence event, Emitter emit){
     emit(state.copyWith(status: Status.loading));
@@ -20,6 +21,13 @@ class SequenceBloc extends Bloc<SequenceEvent,SequenceState>{
     emit(state.copyWith(status: Status.loading));
     var result = state.items;
     result.remove(event.item);
+    emit(SequenceState(result,Status.loaded));
+  }
+  _update(UpdateSequence event, Emitter emit){
+    emit(state.copyWith(status: Status.loading));
+    var result = state.items;
+    int index = result.indexOf(event.before);
+    result[index] = event.after;
     emit(SequenceState(result,Status.loaded));
   }
 }

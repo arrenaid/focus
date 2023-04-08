@@ -25,17 +25,10 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
   bool isChange = false;
   late Sequence sequence;
 
-  // late String currentName;
-  // late int currentMin;
-
-  // List<TextEditingController> _controllersText = [];
-  // List<TextEditingController> _controllersMin = [];
-
   @override
   void initState() {
     super.initState();
      _controllerText.addListener((){});
-    // _controllerMin.addListener(listenerMin);
   }
 
   @override
@@ -52,14 +45,6 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
     super.dispose();
   }
 
-  // void listenerName(){
-  //   currentName = _controllerText.text;
-  // }
-  // void listenerMin(){
-  //   String text = _controllerMin.text;
-  //   print(text);
-  //   currentMin = int.tryParse(text) ?? 0;
-  // }
   @override
   Widget build(BuildContext context) {
     //Map<String, int> sequence ;//= ['start', 10] as Map<String, int>;
@@ -173,24 +158,13 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
               //save
               if(items.length > 1)...[
                 const SizedBox(height: 40),
-              SizedBox(
-                height: 60,
-                child: ElevatedButton(
-                  onPressed:() => isChange ? saveChange(context): saveSequence(context),
-                  style: ElevatedButton.styleFrom(
-                    // padding: const EdgeInsets.symmetric(
-                    //     horizontal: 35, vertical: 16),
-                    minimumSize: const Size.fromHeight(50),
-                    alignment: Alignment.center,
-                    shape: const StadiumBorder(),
-                    backgroundColor: col5,
-                  ),
-                  child: Text(
-                    isChange?'CHANGE':'SAVE',
-                    style: tsButton,
-                  ),
-                ),
-              ),],
+                BottomButton(
+                  execute: () => isChange ?  saveChange(context) : saveSequence(context),
+                  name: isChange ? 'CHANGE' : 'SAVE',),
+              ],
+              if(isChange)...[
+                const SizedBox(height: 40),
+                BottomButton(execute: () => remove(context), name: 'REMOVE',),],
               const SizedBox(height: 40),
             ],
           ),
@@ -200,22 +174,6 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
   }
 
   Widget buildSequenceCard(int index, BuildContext context, Component item) {
-    // if(index >= _controllersText.length) {//todo ref
-    //   _controllersText.add(TextEditingController());
-    //   _controllersMin.add(TextEditingController());
-    // }
-
-    // if(item.name != null && (items.length - 1) == index) {
-    //   _controllersText[index].text = item.name!;
-    // }
-    // if(item.minute != null && (items.length - 1) == index) {
-    //   _controllersMin[index].text = item.minute.toString();
-    // }
-
-    // else if(items[index].name != null){
-    //   _controllersText[index].text = items[index].name!;
-    // }
-
     return Transform.rotate(
       angle: index % 2 == 0 ? -pi / 65 : pi / 55,
       child: Container(
@@ -367,14 +325,11 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
           alignment: AlignmentDirectional.center,
           dropdownColor: col2,
           onChanged: (value) {
-            // This is called when the user selects an item.
 
             if(items.last.controllerMin!.text.isNotEmpty
               && items.last.controllerName!.text.isNotEmpty ){
 
             setState(() {
-              //dropdownValue = value!;
-              //save old
               items.last.name = items.last.controllerName!.text;
               int parse = int.parse(items.last.controllerMin!.text);
               items.last.minute = parse;
@@ -386,12 +341,6 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
               } else {
                 items.add(Component.controller(
                   TextEditingController(), TextEditingController(),));
-                // print(_controllersText.last.text);
-                // print(parse);
-                //
-                // items.add(StepSeq(name: _controllersText.last.text,
-                //   minute: parse,
-                //   position: 0, sequence: 0,));
               }
             }
             );
@@ -415,23 +364,47 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
       ),
     );
   }
+  bool _updateFields(BuildContext context){
+    for (var element in items) {
+      if (element.controllerName!.text.isNotEmpty
+          && element.controllerMin!.text.isNotEmpty) {
+        if (element.controllerName!.text != element.name) {
+          element.name = element.controllerName!.text;
+        }
+        if (element.controllerMin!.text != element.minute.toString()) {
+          element.minute = int.parse(element.controllerMin!.text);
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text(
+              'Fill in the fields', style: tsButton,),
+              backgroundColor: col2,));
+        return false;
+      }
+    }
+   return true;
+  }
 
   void saveChange(BuildContext context) {
-
+    var twin = sequence;
+    if(_controllerText.text.isNotEmpty) {
+      if(sequence.name != _controllerText.text && isChange){
+        sequence.name = _controllerText.text;
+      }
+      if(!_updateFields(context))return;
+      context.read<SequenceBloc>().add(UpdateSequence(twin, sequence));
+      Navigator.pop(context, 'OK');
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Enter sequence name', style: tsButton,),
+            backgroundColor: col2,));
+    }
   }
 
   void saveSequence(BuildContext context) {
     if(_controllerText.text.isNotEmpty) {
-      if(items.last.controllerName!.text.isNotEmpty
-          && items.last.controllerMin!.text.isNotEmpty ){
-      items.last.name = items.last.controllerName!.text;
-      items.last.minute = int.parse(items.last.controllerMin!.text);
-      }else{
-        ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text('Fill in the fields component${items.length-1}', style: tsButton,),
-              backgroundColor: col2,));
-        return;
-      }
+      if(!_updateFields(context))return;
       Sequence item = Sequence(name: _controllerText.text, components: items);
       context.read<SequenceBloc>().add(SaveSequence(item));
       Navigator.pop(context, 'OK');
@@ -441,5 +414,34 @@ class _NewSequenceScreenState extends State<NewSequenceScreen> {
           const SnackBar(content: Text('Enter sequence name', style: tsButton,),
             backgroundColor: col2,));
     }
+  }
+  void remove(BuildContext context) {
+      context.read<SequenceBloc>().add(RemoveSequence(sequence));
+      Navigator.pop(context, 'OK');
+  }
+}
+
+class BottomButton extends StatelessWidget {
+  const BottomButton({
+    Key? key, required this.execute, required this.name,
+  }) : super(key: key);
+  final GestureTapCallback execute;
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 60,
+      child: ElevatedButton(
+        onPressed: execute,
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(50),
+          alignment: Alignment.center,
+          shape: const StadiumBorder(),
+          backgroundColor: col5,
+        ),
+        child: Text(name, style: tsButton),
+      ),
+    );
   }
 }

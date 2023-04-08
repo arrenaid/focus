@@ -4,7 +4,6 @@ import 'package:focus/bloc/focus_bloc.dart';
 import 'package:focus/bloc/model_bloc.dart';
 import 'package:focus/bloc/sequence_bloc.dart';
 import 'package:focus/screens/focus_screen.dart';
-
 import 'model/sequence.dart';
 
 void main() {
