@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus/screens/sequence_screen.dart';
@@ -19,9 +22,11 @@ class FocusScreen extends StatelessWidget {
 }
 class FocusPage extends StatelessWidget {
   const FocusPage({Key? key}) : super(key: key);
+  final double angle = 43;
 
   @override
   Widget build(BuildContext context) {
+
     return BlocListener<FocusBloc,FocusState>(listener: (context,state){
       if(state is FocusCompleteState){
         context.read<ModelBloc>().insert(state.timerType);// todo test
@@ -40,7 +45,9 @@ class FocusPage extends StatelessWidget {
             //milliseconds
             Align(
                 alignment: const FractionalOffset(0.5, 0.3),
-              child: Text(context.read<FocusBloc>().getMilliSec(), style: tsAlt,),
+              child: Transform.rotate(
+                  angle: pi / angle,
+                  child: Text(context.read<FocusBloc>().getMilliSec(), style: tsAlt,)),
             ),
             Align(
                 alignment: const FractionalOffset(0.9, 0.1),
@@ -52,7 +59,7 @@ class FocusPage extends StatelessWidget {
                     );
                   },
                   icon: const Icon(CupertinoIcons.arrowtriangle_left, color: col4,
-                    //shadows: [shadowDef], //todo ref
+                    shadows: [shadowDef],
                   ),
                 )
             ),
@@ -96,7 +103,9 @@ class FocusPage extends StatelessWidget {
               //   padding: const EdgeInsets.all(5),
               //   child: Container(
               //     width:  MediaQuery.of(context).size.width * 8 / 10 ,
-                    child: Text(state.visibleResult, style: tsDef.copyWith(fontSize: 140),),
+                    child: Transform.rotate(
+                        angle: pi / angle,
+                        child: Text(state.visibleResult, style: tsDef.copyWith(fontSize: 140),)),
               //   ),
               // ),
             ),
@@ -127,7 +136,8 @@ class FocusPage extends StatelessWidget {
             icon: Icon( state.isStart
                 ? Icons.pause_sharp
                 : Icons.play_arrow_sharp,
-              color: col5,
+              color: col4,
+              shadows: const [shadowDef],
 
             ),
           )),
