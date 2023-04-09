@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focus/screens/sequence_screen.dart';
@@ -28,7 +27,7 @@ class FocusPage extends StatelessWidget {
         context.read<ModelBloc>().insert(state.timerType);// todo test
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Finish', style: tsDef,),
-              backgroundColor: col5,));
+              backgroundColor: Colors.red,));
       }
     },
       child: BlocBuilder<FocusBloc,FocusState> (
@@ -176,7 +175,8 @@ class FocusPage extends StatelessWidget {
                   return const StatScreen();
                 },);
                 },
-                icon: const Icon(Icons.keyboard_arrow_up_rounded)
+                icon: const Icon(CupertinoIcons.arrowtriangle_up, color: col4,
+                  shadows: [shadowDef],)
             ),
           ),
           ],
