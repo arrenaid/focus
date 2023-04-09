@@ -7,7 +7,7 @@ class SequenceState extends Equatable{
   const SequenceState(this.items, this.status);
 
   @override
-  List<Object?> get props => [items];
+  List<Object?> get props => [items,status];
 
   SequenceState copyWith({
     List<Sequence>? items,

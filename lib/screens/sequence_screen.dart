@@ -2,9 +2,11 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:focus/bloc/model_bloc.dart';
 import 'package:focus/bloc/sequence_bloc.dart';
 import 'package:focus/model/sequence.dart';
 import 'package:focus/screens/new_sequence_screen.dart';
+import '../bloc/model_bloc.dart';
 import '../constants.dart';
 
 class SequenceScreen extends StatelessWidget {
@@ -18,52 +20,57 @@ class SequenceScreen extends StatelessWidget {
       Sequence(name: 'add', components: [])];
 
     return BlocBuilder<SequenceBloc,SequenceState>(
-       buildWhen: (prevState, currentState) => (prevState != currentState),
-builder: (context, state){
-          // List<Sequence> sequence = [
-          //   Sequence(name: 'add', components: []),];
-          // sequence.addAll(state.items);
-          //twin = state.items;
-     return
-        Scaffold(
-        backgroundColor: col1,
-        body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            //direction: Axis.vertical,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('sequence', style: tsDef,),
-                IconButton(onPressed: () =>Navigator.of(context).pop(),
-                  iconSize: 40,
-                  icon: const Icon( CupertinoIcons.back, color: col4,),
-                ),
-              ],
-            ),
-            Expanded(
-              child: GridView.count(crossAxisCount: 2,
-                children: List.generate(state.items.length,//sequence.length,
-                      (index) => index == (0)
-                          ? SequenceAdd(index: index)
-                          : SequenceCell(index: index,
-                          name: state.items[index].name /*sequence[index].name*/,
-                          isSelected: index == 0,
-                          sequence: state.items[index],
+      buildWhen: (previousState, state) {
+        return previousState != state;
+      },
+        builder: (context, state){
+        return Scaffold(
+            backgroundColor: col1,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  //direction: Axis.vertical,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('sequence', style: tsDef,),
+                          IconButton(onPressed: () =>Navigator.of(context).pop(),
+                            iconSize: 40,
+                            icon: const Icon( CupertinoIcons.back, color: col4,),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: GridView.count(crossAxisCount: 2,
+                          children: List.generate(state.items.length,//sequence.length,
+                                (index) => index == (0)
+                                ? SequenceAdd(index: index)
+                                : SequenceCell(index: index,
+                              name: state.items[index].name /*sequence[index].name*/,
+                              isSelected: index == 0,
+                              sequence: state.items[index],
+                            ),
+                          ),
                         ),
+                      )
+
+                    ]
                 ),
               ),
-            )
-
-          ]
-      ),
-        ),
-      ));
-}
+            ));
+    }
     );
-  }
+    }
+//        buildWhen: (prevState, currentState) => (prevState != currentState),
+// builder: (context, state){
+//           // List<Sequence> sequence = [
+//           //   Sequence(name: 'add', components: []),];
+//           // sequence.addAll(state.items);
+//           //twin = state.items;
+
+  //}
 
 }
 class SequenceAdd  extends StatelessWidget {
