@@ -56,9 +56,9 @@ class StatScreen extends StatelessWidget {
                       //   ],
                       // )
                   ),
-                  boxBuild( topBoxSize,  -pi / 45 , Text('2'), isFill: true),
-                  boxBuild( topBoxSize, -pi / 65, Text('3'), isFill: true),
-                  boxBuild( topBoxSize, pi / 85, Text('4') , isFill: true),
+                  boxBuild( topBoxSize,  -pi / 45 , const Text('2'), isFill: true),
+                  boxBuild( topBoxSize, -pi / 65, const Text('3'), isFill: true),
+                  boxBuild( topBoxSize, pi / 85, const Text('4') , isFill: true),
                 ],
               ),
               const SizedBox(height: 10),
@@ -103,7 +103,7 @@ class StatScreen extends StatelessWidget {
         children: [
           Transform.rotate(
             angle: index % 2 == 0 ? -pi / (30 + index) : pi / (45 + index),
-            child: Container(
+            child: SizedBox(
               height: size,
               width: size,
               // decoration: BoxDecoration(
